@@ -1,0 +1,22 @@
+{
+    "token": "YOUR-BOT-TOKEN",
+    "client_id": "YOUR-CLIENT-ID",
+    "client_secret": "YOUR-CLIENT-SECRET",
+    "redirect_uri": "YOUR-REDIRECT-URI",
+    "scope": "identify%20guilds.join",
+
+    "admin_guilds": [],
+    "owners": [],
+    "log_channel": 0,
+
+    "server_host": "0.0.0.0",
+    "server_port": 8000,
+
+    "target_guild": 0,
+    "verified_role_id": 0,
+
+    "quart_logging": true,
+
+    "howto": "Leave `target_guild` and `verified_role_id` at 0 if you dont want to verify the users. The users will get a role on the target guild when verified.",
+    "available-scopes": "Available scopes: identify guilds guilds.join email. Separate scopes using %20"
+}
