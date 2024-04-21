@@ -1,0 +1,1 @@
+Put your HTML file named "index.html" in this folder. This file will be visible to everyone after they will verify.
