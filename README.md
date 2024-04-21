@@ -46,3 +46,8 @@
 This github repo is for **EDUCATIONAL PURPOSES ONLY.** I am not responsible for your actions.
 
 ---
+
+### 🌟 Having troubles?
+If you have an error or a problem, feel free to [start a new issue!](https://github.com/knockstick/knos-authbot/issues/new)
+
+---
