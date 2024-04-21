@@ -45,8 +45,3 @@
  This bot **may** lead to account termination or API blocking. I am not responsible for your actions.
 
 ---
-
-<p align="center">
-  <img src="https://img.shields.io/github/stars/knockstick/knos-authbot.svg?style=for-the-badge&labelColor=black&color=f429ff&logo=IOTA"/>
-  <img src="https://img.shields.io/github/languages/top/knockstick/knos-authbot.svg?style=for-the-badge&labelColor=black&color=f429ff&logo=python"/>
-</p>
