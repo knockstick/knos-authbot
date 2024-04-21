@@ -36,7 +36,7 @@
 
 ### 📸 Screenshots
 <img src="https://media.discordapp.net/attachments/1230859548659683413/1231501737966440520/image.png?ex=6637305e&is=6624bb5e&hm=8c8c6d311fd8d6a83e6fb59b0d83fb966b6b87912ac9f06b54b39ac846729f26&=&format=webp&quality=lossless" style="width: 40%; height: 40%;" alt="An image showing a new verified user">
-<img src="https://media.discordapp.net/attachments/1230859548659683413/1231503389200879626/image.png?ex=663731e8&is=6624bce8&hm=11ffedfb0a9ea384fa86e97ce77004f5570f8186332ece0835fea755ab225b5d&=&format=webp&quality=lossless" style="width: 40%; height: 40%;" alt="An image showing /pull command executed">
+<img src="https://media.discordapp.net/attachments/1230859548659683413/1231503389200879626/image.png?ex=663731e8&is=6624bce8&hm=11ffedfb0a9ea384fa86e97ce77004f5570f8186332ece0835fea755ab225b5d&=&format=webp&quality=lossless" style="width: 40%; height: 40%;" alt="An image showing /pull command">
 
 ---
 
