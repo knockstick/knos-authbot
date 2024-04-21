@@ -11,6 +11,8 @@
 
 ---
 
+<b>[🇷🇺 README на русском](https://github.com/knockstick/knos-authbot/blob/main/README-ru.md/)</b>
+
 ### 🍕 Features
 
 - Sends logs to a Discord channel
