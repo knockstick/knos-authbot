@@ -42,6 +42,6 @@
 
 ### ❗ Disclaimer
 
- This bot **may** lead to account termination or API blocking. I am not responsible for your actions.
+ This bot **may** lead to account termination or API blocking. This github repo is for **EDUCATIONAL PURPOSES ONLY.** I am not responsible for your actions.
 
 ---
