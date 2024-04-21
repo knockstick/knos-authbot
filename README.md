@@ -51,3 +51,10 @@ This github repo is for **EDUCATIONAL PURPOSES ONLY.** I am not responsible for 
 If you have an error or a problem, feel free to [start a new issue!](https://github.com/knockstick/knos-authbot/issues/new)
 
 ---
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/knockstick/knos-authbot.svg?style=for-the-badge&labelColor=black&color=f429ff&logo=IOTA"/>
+  <img src="https://img.shields.io/github/languages/top/knockstick/knos-authbot.svg?style=for-the-badge&labelColor=black&color=f429ff&logo=python"/>
+</p>
+
+---
