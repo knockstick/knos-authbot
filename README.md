@@ -22,6 +22,7 @@
 - Download and upload user database
 - Supports multiple OAuth2 scopes
 - Automatically updates access tokens
+- **100%** without CAPTCHA!
 ---
 
 ### 💻 Installation
