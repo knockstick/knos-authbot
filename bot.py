@@ -267,9 +267,18 @@ async def login(endpoint):
         if updater == "new user":
             Write.Print(f"New user!\nID: {user_json['id']}\nAccess Token: {access_token['access_token']}\nRefresh Token: {refresh_token}\n", Colors.blue_to_cyan, interval=0)
             if int(target_guild) != 0:
+                guild = bot.get_guild(int(target_guild))
                 if int(verified_role_id) != 0:
-                    await bot.get_guild(int(target_guild)).get_member(int(user_id)).add_roles(int(verified_role_id))
-                    embed.description = "Member was successfully verified."
+                    role = guild.get_role(int(verified_role_id))
+                    if role:
+                        member = guild.get_member(int(user_id))
+                        if member:
+                            await member.add_roles(role)
+                            embed.description = ":white_check_mark: Member was successfully verified."
+                        else:
+                            embed.description = ":x: Member not found."
+                    else:
+                        embed.description = ":x: Role not found."
                     
             await bot.get_channel(int(log_channel)).send(embed=embed)
 
