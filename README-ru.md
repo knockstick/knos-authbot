@@ -28,7 +28,7 @@
 
 - Необходим `Python 3.9+`
 1. Скачайте репозиторий *(если ещё не скачали)*
-2. Создайте приложение на <b>[Discord Developer Portal](https://discord.com/developers)</b>
+2. Создайте приложение на <b>[Discord Developer Portal](https://discord.com/developers)</b> и **включите все intents во вкладке Bot**
 3. Отредактируйте [config.json](https://github.com/knockstick/knos-authbot/blob/main/config.json) и настройте HTML страницу в [папке templates](https://github.com/knockstick/knos-authbot/blob/main/templates)
 4. Установите библиотеки используя `pip3 install -r requirements.txt`
 5. Запустите бота используя `python3 bot.py`
