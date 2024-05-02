@@ -12,11 +12,11 @@
     "server_host": "0.0.0.0",
     "server_port": 8000,
 
-    "target_guild": 0,
-    "verified_role_id": 0,
+    "verify_guilds": {
+        "1234567890": 987654321,
+        "Put your server ID here": "Put your role ID for this server here (without quotes). You can leave this dict empty for no guilds with verification system."
+    },
 
-    "quart_logging": true,
-
-    "howto": "Leave `target_guild` and `verified_role_id` at 0 if you dont want to verify the users. The users will get a role on the target guild when verified.",
+    "server_logging": true,
     "available-scopes": "Available scopes: identify guilds guilds.join email. Separate scopes using %20"
 }
