@@ -58,6 +58,21 @@ If you have an error or a problem, feel free to [start a new issue!](https://git
 Don't forget to leave a **star!**
 
 ---
+### 📰 Changelog
+```diff
+v1.1 ⋮ 02.05.2024
++ Added `amount` argument to /pull command
++ You can now specify multiple guilds and verify roles in config.json
++ Better /pull stats
++ Now showing state and server name in the log
++ Login URL in /verify-embed now has a state
+- Removed `log_on_end` argument from /pull command
+
+v1.0 ⋮ 21.04.2024
+! Initial release
+```
+
+---
 
 <p align="center">
   <img src="https://img.shields.io/github/stars/knockstick/knos-authbot.svg?style=for-the-badge&labelColor=black&color=f429ff&logo=IOTA"/>
