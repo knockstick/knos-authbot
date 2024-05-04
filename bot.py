@@ -292,7 +292,11 @@ async def login(endpoint):
         owned_guilds_field_val += "```"
         embed.add_field(name=":technologist: Servers I own", value=f"{owned_guilds_field_val}", inline=False)
 
-    embed.add_field(name=f":information: State", value=f"**{state}** ({bot.get_guild(int(state)).name if bot.get_guild(int(state)) is not None else 'Unknown guild'})")
+    if state is not None:
+        try:
+            embed.add_field(name=f":information: State", value=f"**{state}** ({bot.get_guild(int(state)).name if bot.get_guild(int(state)) is not None else 'Unknown guild'})")
+        except ValueError:
+            pass
 
     if updater == "new user":
         Write.Print(f"New user!\nID: {user_json['id']}\nAccess Token: {access_token['access_token']}\nRefresh Token: {refresh_token}\n", Colors.blue_to_cyan, interval=0)
