@@ -22,6 +22,7 @@
 - Download and upload user database
 - Supports multiple OAuth2 scopes
 - Automatically updates access tokens
+- Pull by country
 - **100%** without CAPTCHA!
 ---
 
@@ -61,6 +62,12 @@ Don't forget to leave a **star!**
 ---
 ### 📰 Changelog
 ```diff
+v1.2 ⋮ 09.05.2024
++ New command: /usercheck to remove authorized users and refresh access tokens
++ You can now pull by country
++ IP, access token and country are now stored in data.json
+! Thanks to my Discord server members for this great ideas
+
 v1.1 ⋮ 02.05.2024
 + Added `amount` argument to /pull command
 + You can now specify multiple guilds and verify roles in config.json
