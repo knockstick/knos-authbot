@@ -39,7 +39,7 @@
 ---
 
 ### 📸 Screenshots
-<img src="https://media.discordapp.net/attachments/1230859548659683413/1231501737966440520/image.png?ex=6637305e&is=6624bb5e&hm=8c8c6d311fd8d6a83e6fb59b0d83fb966b6b87912ac9f06b54b39ac846729f26&=&format=webp&quality=lossless" style="width: 40%; height: 40%;" alt="An image showing a new verified user">
+<img src="https://media.discordapp.net/attachments/1230859548659683413/1238070355717918780/oauth2scr.png?ex=663df25f&is=663ca0df&hm=ce07709135fdbd96fafe7b89fad95991f8c70734a306a132eb0a5d19dec6d815&=&format=webp&quality=lossless&width=635&height=762" style="width: 40%; height: 40%;" alt="An image showing a new verified user">
 <img src="https://media.discordapp.net/attachments/1230859548659683413/1231503389200879626/image.png?ex=663731e8&is=6624bce8&hm=11ffedfb0a9ea384fa86e97ce77004f5570f8186332ece0835fea755ab225b5d&=&format=webp&quality=lossless" style="width: 40%; height: 40%;" alt="An image showing /pull command">
 <img src="https://media.discordapp.net/attachments/1230404669130412086/1235831050832183376/image.png?ex=6635ccdb&is=66347b5b&hm=3907bdd81fceabf96823da83ff67f2af9e308888ebff5e902148f2a2841a4cd1&=&format=webp&quality=lossless" style="width: 40%; height: 40%;" alt="An image showing /pull command results">
 <img src="https://media.discordapp.net/attachments/1230859548659683413/1231547521395064832/image.png?ex=66375b02&is=6624e602&hm=bdbe0bf15e6545222e5052682ade6ee541a0d7b49475d6ecd51c44b112a21d45&=&format=webp&quality=lossless" style="width: 40%; height: 40%;" alt="The UI of the program">
