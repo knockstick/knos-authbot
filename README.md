@@ -61,7 +61,12 @@ Don't forget to leave a **star!**
 
 ---
 ### 📰 Changelog
+
 ```diff
+v 1.2.1 ⋮ 11.05.2024
++ Minor bug fixes with the new /usercheck command
++ New scope: connections: Display your user connections (like YouTube, Steam) in the log message
+
 v1.2 ⋮ 09.05.2024
 + New command: /usercheck to remove unauthorized users and refresh access tokens
 + You can now pull by country
