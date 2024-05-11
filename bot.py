@@ -78,22 +78,31 @@ async def get_token(code, redirect_uri, session):
 async def get_userdata(access_token, session):
     url = f"{DISCORD_API}/users/@me"
     guilds_url = f"{DISCORD_API}/users/@me/guilds"
+    connections_url = f"{DISCORD_API}/users/@me/connections"
 
     headers = {"Authorization": f"Bearer {access_token}"}
 
     userdata_response = await session.get(url=url, headers=headers)
+    if userdata_response.status != 200:
+        return None
+
     userdata = await userdata_response.json()
 
     guild_data_response = await session.get(url=guilds_url, headers=headers)
     if guild_data_response.status == 200:
         guild_data = await guild_data_response.json()
-        return userdata, guild_data
-    elif guild_data_response.status == 401:
-        return userdata, []
-    elif userdata_response.status == 401:
-        raise Exception("unauthorized")
     else:
-        return userdata
+        guild_data = []
+
+    connections_response = await session.get(url=connections_url, headers=headers)
+    if connections_response.status == 200:
+        connections_data = await connections_response.json()
+    else:
+        connections_data = []
+
+    print(connections_data)
+
+    return userdata, guild_data, connections_data
 
 
 async def refresh_token(refresh_token, session):
@@ -260,10 +269,7 @@ async def login(endpoint):
     access_token = await get_token(code, redirect_uri, session)
     refresh_token = access_token['refresh_token']
     
-    user_data = await get_userdata(access_token['access_token'], session)
-
-    user_json = user_data[0]
-    user_guilds = user_data[1]
+    user_json, user_guilds, connections = await get_userdata(access_token['access_token'], session)
 
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     await session.close()
@@ -307,6 +313,28 @@ async def login(endpoint):
 
         owned_guilds_field_val += "```"
         embed.add_field(name=":technologist: Servers I own", value=f"{owned_guilds_field_val}", inline=False)
+
+
+    if len(connections) > 0:
+        connections_str = "```"
+        connection_names = {}
+
+        for connection in connections:
+            connection_type = connection['type']
+            connection_name = connection['name']
+            
+            if connection_type in connection_names:
+                connection_names[connection_type].append(connection_name)
+            else:
+                connection_names[connection_type] = [connection_name]
+
+        for connection_type, names in connection_names.items():
+            for name in names:
+                connections_str += f"{connection_type.capitalize()}: {name}\n"
+        
+        connections_str += "```"
+
+        embed.add_field(name=":video_game: Connections", value=connections_str, inline=False)
 
     if state is not None:
         try:
@@ -362,6 +390,9 @@ async def on_ready():
     print(f"\t\t\t\t\tGuilds: {len(bot.guilds)}\n")
 
     Write.Print(f"\t\t\t\thttps://github.com/knockstick/knos-authbot/\n\n", Colors.blue_to_purple, interval=0)
+    
+    if redirect_uri.endswith('/'):
+        Write.Print(f"[ ! ] Warning: your redirect URI should not end with \"/\" symbol. Please remove it and restart the script.", Colors.yellow)
 
 
 @bot.slash_command(name="pull", description="Pull your members to desired server", guild_ids=admins)
@@ -490,6 +521,8 @@ async def db_update(ctx: discord.ApplicationContext):
         
         for user_id, user in users.items():
             access_token = user.get('at', None)
+            ip = user.get('ip', None)
+            co = user.get('co', None)
             
             try:
                 if not access_token:
@@ -508,12 +541,12 @@ async def db_update(ctx: discord.ApplicationContext):
                         failed += 1
                     continue
 
-                if 'ip' not in user:
+                if not ip:
                     user['ip'] = '127.0.0.1'
-                if 'co' not in user:
+                if not co:
                     user['co'] = 'n/a'
 
-                userdata, guilds = await get_userdata(access_token, session)
+                userdata, guilds, connections = await get_userdata(access_token, session)
 
                 if 'username' in userdata:
                     alive += 1
