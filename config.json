@@ -18,5 +18,5 @@
     },
 
     "server_logging": true,
-    "available-scopes": "Available scopes: identify guilds guilds.join email. Separate scopes using %20"
+    "available-scopes": "Available scopes: identify guilds guilds.join email connections. Separate scopes using %20"
 }
