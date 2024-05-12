@@ -99,9 +99,7 @@ async def get_userdata(access_token, session):
         connections_data = await connections_response.json()
     else:
         connections_data = []
-
-    print(connections_data)
-
+        
     return userdata, guild_data, connections_data
 
 
