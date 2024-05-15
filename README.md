@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/knockstick/knos-authbot">
-    <img src="https://media.discordapp.net/attachments/872388362160455693/1231498864926916649/logo.png?ex=66372db1&is=6624b8b1&hm=bbecdf5c8bd5af7632622b82586a98bf19dd5975a82e3733f6488cee94bed7ef&=&format=webp&quality=lossless" alt="Logo" style="width: 60%; height: 60%;">
+    <img src="https://github.com/knockstick/knos-authbot/blob/main/static/logo.png?raw=true" alt="Logo" style="width: 60%; height: 60%;">
   </a>
   
   <h2 align="center">Kno's AuthBot</h2>
