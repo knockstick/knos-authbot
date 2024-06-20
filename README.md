@@ -28,6 +28,8 @@
 
 ### 💻 Installation
 
+[Click here to watch video tutorial](https://youtu.be/Y66Wk7iHOQY)
+
 - `Python 3.9+` required
 1. Download the repository *(if you haven't already)*
 2. Create an application at the <b>[Discord Developer Portal](https://discord.com/developers)</b> and **enable all intents**
