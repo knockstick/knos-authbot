@@ -12,6 +12,7 @@
 ---
 
 <b>[🇷🇺 README на русском](https://github.com/knockstick/knos-authbot/blob/main/README-ru.md/)</b>
+<b>[Click here to join the support server](https://discord.gg/ph85kayeuH)</b>
 
 ### 🍕 Features
 
