@@ -66,7 +66,11 @@ Don't forget to leave a **star!**
 ### 📰 Changelog
 
 ```diff
-v 1.2.1 ⋮ 11.05.2024
+v.1.2.2 ⋮ 27.01.2025
++ Added KeyError['refresh_token'] error handling
++ Removed some junk
+
+v1.2.1 ⋮ 11.05.2024
 + Minor bug fixes with the new /usercheck command
 + New scope: connections: Display your user connections (like YouTube, Steam) in the log message
 
