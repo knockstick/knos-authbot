@@ -37,7 +37,7 @@ if not quart_logging:
 DISCORD_API = "https://discord.com/api/"
 
 LOGIN_URL = f"{DISCORD_API}oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}"
-LOGIN_REDIRECT = f"{DISCORD_API}https://discord.com/oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}"
+LOGIN_REDIRECT = f"https://discord.com/oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}"
 TOKEN_URL = f"{DISCORD_API}oauth2/token"
 
 
