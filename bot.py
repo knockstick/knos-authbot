@@ -1,11 +1,10 @@
+import traceback
 import requests
 import logging
 import discord
 import asyncio
 import aiohttp
-import shutil
 import json
-import time
 import os
 
 from quart import Quart, redirect, request, render_template
@@ -16,7 +15,7 @@ with open('config.json', 'r') as f:
 
 __title__ = "kno's authbot"
 __author__ = "knockstick"
-__version__ = "1.2"
+__version__ = "1.2.1"
 
 token = config['token']
 redirect_uri = config['redirect_uri']
@@ -35,13 +34,11 @@ server_port = config['server_port']
 if not quart_logging:
     logging.getLogger('hypercorn.access').disabled = True
 
-API_VER = "v9"
 DISCORD_API = "https://discord.com/api/"
-ENDPOINT = DISCORD_API + API_VER
 
-LOGIN_URL = DISCORD_API + f"oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}"
-LOGIN_REDIRECT = f"https://discord.com/oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}"
-TOKEN_URL = DISCORD_API + "oauth2/token"
+LOGIN_URL = f"{DISCORD_API}oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}"
+LOGIN_REDIRECT = f"{DISCORD_API}https://discord.com/oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}"
+TOKEN_URL = f"{DISCORD_API}oauth2/token"
 
 
 def get_ip_info(ip_address):
@@ -225,7 +222,6 @@ async def pull(ctx, server_id, amount=None, country=None):
     return {"status": "success"}
 
 
-
 class Bot(discord.Bot):
     def __init__(self, description=None, *args, **kwargs):
         super().__init__(description, *args, **kwargs)
@@ -259,14 +255,34 @@ async def login(endpoint):
     code = request.args.get('code')
     state = endpoint
 
-
     if not code:
         await session.close()
         return await render_template('index.html')
     
     access_token = await get_token(code, redirect_uri, session)
-    refresh_token = access_token['refresh_token']
-    
+
+    try:
+        refresh_token = access_token['refresh_token']
+    except KeyError:
+        if 'error' in access_token:
+            if 'invalid' in access_token['error']:
+                Write.Print(f"Some bot credentials are invalid. Discord says: {access_token['error'].replace('_', ' ')}", Colors.light_red)
+                await session.close()
+                return
+            
+            Write.Print(f"Error when authorizing a user: {access_token['error'].replace('_', ' ')}", Colors.yellow)
+        else:
+            Write.Print(f"Got an invalid JSON when authorizing a user: {access_token}", Colors.yellow)
+
+        await session.close()
+        return
+    except Exception as e:
+        Write.Print(f"Unknown exception when authorizing a user: {e} (Access token JSON: {access_token}). Printing traceback:\n\n", Colors.light_red)
+        traceback.print_exc()
+
+        await session.close()
+        return
+
     user_json, user_guilds, connections = await get_userdata(access_token['access_token'], session)
 
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -311,7 +327,6 @@ async def login(endpoint):
 
         owned_guilds_field_val += "```"
         embed.add_field(name=":technologist: Servers I own", value=f"{owned_guilds_field_val}", inline=False)
-
 
     if len(connections) > 0:
         connections_str = "```"
