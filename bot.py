@@ -15,7 +15,7 @@ with open('config.json', 'r') as f:
 
 __title__ = "kno's authbot"
 __author__ = "knockstick"
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 
 token = config['token']
 redirect_uri = config['redirect_uri']
